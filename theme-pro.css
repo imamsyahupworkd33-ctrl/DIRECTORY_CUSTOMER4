@@ -1,0 +1,202 @@
+/* =========================================================
+   THEME PRO — tampilan admin lebih bersih & profesional
+   Dimuat SETELAH style.css, jadi aturan di sini menimpa yang lama.
+   Untuk kembali ke tampilan lama: hapus baris <link> theme-pro.css
+   di index.html.
+   ========================================================= */
+
+:root{
+    --bg:#F5F6FA;
+    --surface-alt:#F7F8FC;
+    --border:#E6E8F0;
+    --radius-lg:14px;
+    --radius-xl:14px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+    --shadow-md:0 4px 12px rgba(16,24,40,.08);
+}
+
+body{ padding:0 0 60px; }
+body::before, body::after{ display:none; }
+
+.app-shell{ max-width:1360px; padding:0 24px; }
+
+/* ---------- Header / navigasi ---------- */
+header.app-header{
+    position:sticky; top:0; z-index:50;
+    margin:0 -24px 22px;
+    padding:12px 24px;
+    border:none; border-bottom:1px solid var(--border);
+    border-radius:0;
+    background:rgba(255,255,255,.92);
+    box-shadow:var(--shadow-sm);
+}
+.brand-mark{
+    width:38px; height:38px; border-radius:10px; font-size:14px;
+    box-shadow:none; background:var(--primary);
+}
+.brand-text h1{ font-size:16px; font-weight:800; }
+.brand-text span{ font-size:11.5px; }
+
+.page-nav{
+    background:transparent; border:none; padding:0;
+    align-items:center; gap:12px;
+}
+.nav-group{ display:flex; gap:2px; flex:0 0 auto; }
+.nav-main{
+    background:var(--surface-alt-2); border:1px solid var(--border);
+    border-radius:12px; padding:3px;
+}
+.nav-main button{ padding:8px 16px; font-size:13px; border-radius:9px; }
+.nav-main button.active{ background:var(--primary); color:#fff; box-shadow:0 2px 8px rgba(79,70,229,.28); }
+.nav-main button.active .nav-icon{ filter:none; }
+.nav-divider{ width:1px; height:24px; background:var(--border-strong); flex:0 0 auto; }
+.nav-sub button{ padding:7px 12px; font-size:12.5px; font-weight:600; color:var(--text-secondary); border-radius:8px; }
+.nav-sub button.active{ background:var(--primary-soft); color:var(--primary); box-shadow:none; }
+.page-nav button{ font-family:var(--font-body); font-weight:600; }
+
+/* ---------- Tab BEM / LEM / SEM (segmented) ---------- */
+.dashboard-tabs{
+    display:flex; width:fit-content; gap:2px; padding:3px; margin-bottom:18px;
+    background:var(--surface-alt-2); border:1px solid var(--border); border-radius:12px;
+}
+.tab{
+    border:none; background:transparent; box-shadow:none;
+    padding:8px 22px; border-radius:9px; font-size:13px;
+}
+.tab:hover{ transform:none; border:none; color:var(--primary); }
+.tab.active{ background:var(--primary); color:#fff; box-shadow:0 2px 8px rgba(79,70,229,.28); }
+
+/* ---------- Kartu statistik ---------- */
+.stats{ gap:14px; margin-bottom:18px; }
+.stat-card{ padding:16px 18px 14px; border-radius:12px; gap:6px; }
+.stat-card:hover{ transform:none; box-shadow:var(--shadow-md); }
+.stat-card::before{ height:3px; }
+.stat-card h3{ font-size:11px; }
+.stat-card span.value{ font-size:26px; }
+.stat-card .stat-icon{ width:30px; height:30px; font-size:14px; }
+
+/* ---------- Panel ---------- */
+.panel{ padding:20px; border-radius:12px; margin-bottom:18px; }
+.panel-title{ font-size:14.5px; margin-bottom:16px; padding-bottom:12px; }
+.panel-hint{ margin-left:auto; font-family:var(--font-body); font-size:11.5px; font-weight:500; color:var(--text-muted); }
+.muted-note{ font-size:12.5px; color:var(--text-secondary); margin:-6px 0 14px; }
+
+/* ---------- Tabel (gaya monitoring) ---------- */
+#view-dashboard .table-wrap{
+    max-height:68vh; overflow:auto;
+    border:1px solid var(--border); border-radius:12px;
+}
+#view-dashboard thead th,
+.cf-table thead th{
+    position:sticky; top:0; z-index:2;
+    background:#F1F3F9; color:#475069;
+    font-size:11px; padding:11px 14px; border-bottom:1px solid var(--border-strong);
+    border-radius:0 !important;
+}
+th.sortable{ cursor:pointer; user-select:none; }
+th.sortable::after{ content:"↕"; margin-left:6px; font-size:10px; opacity:.35; }
+th.sortable:hover{ color:var(--primary); }
+th.sortable.sort-asc::after{ content:"▲"; opacity:1; color:var(--primary); }
+th.sortable.sort-desc::after{ content:"▼"; opacity:1; color:var(--primary); }
+
+tbody td{ padding:11px 14px; font-size:13px; }
+#tableBody tr:nth-child(even), #cfEntryBody tr:nth-child(even){ background:#FAFBFE; }
+tbody tr:hover{ background:#F1F4FF !important; }
+.col-no{ color:var(--text-muted); font-weight:600; width:44px; }
+.customer-name{ font-weight:700; }
+.cell-sub{ font-size:11.5px; color:var(--text-muted); margin-top:1px; }
+.date-cell{ white-space:nowrap; color:var(--text-secondary); font-size:12.5px; }
+.progress-pct{ font-weight:600; color:var(--text-muted); margin-left:4px; }
+.progress-cell{ min-width:150px; }
+.progress-track{ height:6px; }
+.keterangan-text{ display:inline-block; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; }
+
+.sisa-pill{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; white-space:nowrap; }
+.sisa-ok{ background:var(--success-soft); color:var(--success); }
+.sisa-warn{ background:var(--warning-soft); color:var(--warning); }
+.sisa-danger{ background:var(--danger-soft); color:var(--danger); }
+.sisa-done{ background:var(--surface-alt-2); color:var(--text-secondary); }
+
+/* ---------- CashFlow ---------- */
+.cf-summary{ grid-template-columns:repeat(3,1fr); }
+.cf-summary .stat-card span.value{ font-size:24px; }
+.cf-new-batch{ margin-left:auto; padding:8px 14px; font-size:12.5px; }
+
+.cf-batch-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; }
+.cf-batch-card{
+    text-align:left; cursor:pointer; font-family:var(--font-body);
+    background:var(--surface); border:1.5px solid var(--border); border-radius:12px;
+    padding:14px 16px; display:flex; flex-direction:column; gap:6px;
+    transition:border-color .15s ease, box-shadow .15s ease;
+}
+.cf-batch-card:hover{ border-color:var(--primary); box-shadow:var(--shadow-md); }
+.cf-batch-card.selected{ border-color:var(--primary); background:var(--primary-soft); }
+.cf-batch-card-top{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.cf-batch-name{ font-family:var(--font-display); font-weight:800; font-size:14px; color:var(--text-primary); }
+.cf-batch-total{ font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--text-primary); }
+.cf-batch-sub{ font-size:11.5px; color:var(--text-muted); }
+
+.cf-pill{ display:inline-block; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
+.pill-active{ background:var(--success-soft); color:var(--success); }
+.pill-withdrawn{ background:var(--surface-alt-2); color:var(--text-secondary); }
+.cf-batch-card.is-withdrawn .cf-batch-total{ color:var(--text-secondary); }
+
+.cf-batch-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+.cf-batch-head h2{ font-size:20px; font-weight:800; }
+.cf-batch-meta{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:6px; font-size:12px; color:var(--text-muted); }
+.cf-batch-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+.cf-batch-actions .btn{ padding:9px 14px; font-size:12.5px; }
+.cf-batch-actions .btn-icon{ width:38px; padding:0; }
+
+.cf-form{
+    display:grid; grid-template-columns:1.2fr 1.2fr 1fr .6fr 1fr auto; gap:12px; align-items:end;
+    padding:14px; margin-bottom:16px; background:var(--surface-alt); border:1px solid var(--border); border-radius:12px;
+}
+.cf-form .field{ margin:0; }
+.cf-total-preview{
+    height:44px; display:flex; align-items:center; padding:0 12px; border-radius:10px;
+    background:var(--surface); border:1.5px dashed var(--border-strong);
+    font-family:var(--font-display); font-weight:800; color:var(--primary);
+}
+.cf-form-btn .btn{ height:44px; white-space:nowrap; }
+.cf-locked-note{ background:var(--warning-soft); color:var(--warning); padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:14px; }
+
+.cf-table{ width:100%; }
+.cf-table .num, .cf-table th.num{ text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.cf-row-total{ font-weight:800; }
+.cf-table tfoot td{
+    background:#F1F3F9; border-top:2px solid var(--border-strong);
+    font-weight:800; padding:14px; font-size:14px;
+}
+.cf-foot-label{ text-align:right; letter-spacing:.05em; font-size:12px !important; color:var(--text-secondary); }
+.cf-foot-total{ color:var(--primary); font-size:16px !important; }
+#view-cashflow .table-wrap{ border:1px solid var(--border); border-radius:12px; overflow:auto; }
+
+@media (max-width:1100px){
+    .cf-form{ grid-template-columns:1fr 1fr 1fr; }
+    .cf-form-btn{ grid-column:span 3; }
+    .cf-form-btn .btn{ width:100%; }
+}
+@media (max-width:900px){
+    .app-shell{ padding:0 14px; }
+    header.app-header{ margin:0 -14px 16px; padding:10px 14px; position:static; }
+    .nav-group{ flex:0 0 auto; }
+    .cf-summary{ grid-template-columns:1fr; }
+}
+@media (max-width:640px){
+    .cf-form{ grid-template-columns:1fr 1fr; }
+    .cf-form-btn{ grid-column:span 2; }
+    #view-dashboard .table-wrap{ max-height:none; border:none; }
+    tfoot{ display:block; }
+    .cf-table tfoot tr{ display:flex; flex-wrap:wrap; justify-content:space-between; background:#F1F3F9; border-radius:10px; padding:6px 10px; margin-top:8px; }
+    .cf-table tfoot td{ width:auto; background:transparent; border:none; padding:6px; }
+    .cf-table tfoot td:empty{ display:none; }
+    .cf-foot-label{ text-align:left; }
+    .cf-table td.num{ text-align:left; }
+}
+
+/* tombol aksi tidak turun baris di desktop (tabel bisa digeser ke samping) */
+@media (min-width:641px){
+    #view-dashboard .actions-cell{ flex-wrap:nowrap; align-items:center; }
+    #view-dashboard td .btn-wrap{ white-space:nowrap; }
+}

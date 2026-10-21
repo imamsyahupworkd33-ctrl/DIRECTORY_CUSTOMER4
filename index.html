@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4F46E5">
+<meta name="description" content="Lenstore Management Dashboard — kelola pesanan &amp; arsip dengan mudah">
+<title>Lenstore Management Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme-pro.css">
+<link rel="stylesheet" href="theme-dark.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <header class="app-header">
+        <div class="brand">
+            <div class="brand-mark">LS</div>
+            <div class="brand-text">
+                <h1>Lenstore Management</h1>
+                <span>Kelola langganan, farm &amp; pendapatan</span>
+            </div>
+        </div>
+
+        <nav class="page-nav" id="pageNav">
+            <div class="nav-group nav-main" id="navDir" role="tablist" aria-label="Directory">
+                <button type="button" class="nav-toggle" data-toggle="navDir" aria-expanded="true" title="Buka / minimize menu Directory">
+                    <span class="nav-icon">📁</span><span class="nav-label">DIRECTORY</span><span class="nav-current"></span><span class="nav-caret">‹</span>
+                </button>
+                <div class="nav-items">
+                    <button type="button" class="active" data-page="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span> <span class="badge-count rn-nav" id="rnNavBadge" style="display:none;">0</span></button>
+                    <button type="button" data-page="produk"><span class="nav-icon">🌾</span><span class="nav-label">List-Farm</span></button>
+                    <button type="button" data-page="statistik"><span class="nav-icon">📈</span><span class="nav-label">Statistik</span></button>
+                    <button type="button" data-page="farmsell"><span class="nav-icon">🌱</span><span class="nav-label">Farm Sell</span></button>
+                    <button type="button" data-page="havsell"><span class="nav-icon">🔑</span><span class="nav-label">HAV Sell</span></button>
+                    <button type="button" data-page="supply"><span class="nav-icon">📦</span><span class="nav-label">Supply & Stock</span> <span class="badge-count" id="spOrderBadge" style="display:none;">0</span></button>
+                    <button type="button" data-page="cashflow"><span class="nav-icon">💰</span><span class="nav-label">CashFlow</span></button>
+                </div>
+            </div>
+            <span class="nav-divider"></span>
+            <div class="nav-group nav-sub collapsed" id="navSet">
+                <button type="button" class="nav-toggle" data-toggle="navSet" aria-expanded="false" title="Buka / minimize menu Setting">
+                    <span class="nav-icon">⚙️</span><span class="nav-label">SETTING</span><span class="nav-current"></span><span class="nav-caret">‹</span>
+                </button>
+                <div class="nav-items">
+                    <button type="button" data-page="arsip"><span class="nav-icon">🗂️</span><span class="nav-label">Arsip</span> <span class="badge-count" id="archiveCountBadge">0</span></button>
+                    <button type="button" data-page="tagar"><span class="nav-icon">🏷️</span><span class="nav-label">Tagar</span></button>
+                    <button type="button" data-page="pengumuman"><span class="nav-icon">📣</span><span class="nav-label">Pengumuman</span></button>
+                    <button type="button" data-page="akun"><span class="nav-icon">👤</span><span class="nav-label">Akun Pelanggan</span></button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ============ VIEW: DASHBOARD AKTIF ============ -->
+    <section class="view active" id="view-dashboard">
+
+        <nav class="dashboard-tabs" id="dashboardTabs">
+            <button type="button" class="tab active" data-dashboard="BEM">BEM <span class="tab-badge" id="rnTabBEM" style="display:none">0</span></button>
+            <button type="button" class="tab" data-dashboard="LEM">LEM <span class="tab-badge" id="rnTabLEM" style="display:none">0</span></button>
+            <button type="button" class="tab" data-dashboard="SEM">SEM <span class="tab-badge" id="rnTabSEM" style="display:none">0</span></button>
+        </nav>
+
+        <section class="stats">
+            <div class="stat-card total" onclick="applyStatusFilter('semua')" title="Tampilkan semua status" style="cursor:pointer;">
+                <div class="stat-top">
+                    <h3>Total Pesanan</h3>
+                    <div class="stat-icon">📦</div>
+                </div>
+                <span class="value" id="totalOrder">0</span>
+            </div>
+
+            <div class="stat-card proses" onclick="applyStatusFilter('proses')" title="Filter: Proses" style="cursor:pointer;">
+                <div class="stat-top">
+                    <h3>Proses</h3>
+                    <div class="stat-icon">⏳</div>
+                </div>
+                <span class="value" id="prosesOrder">0</span>
+            </div>
+
+            <div class="stat-card limit" onclick="applyStatusFilter('mendekati')" title="Filter: Mendekati Limit" style="cursor:pointer;">
+                <div class="stat-top">
+                    <h3>Mendekati Limit</h3>
+                    <div class="stat-icon">⚠️</div>
+                </div>
+                <span class="value" id="limitOrder">0</span>
+            </div>
+
+            <div class="stat-card selesai" onclick="applyStatusFilter('selesai')" title="Filter: Limit Tercapai" style="cursor:pointer;">
+                <div class="stat-top">
+                    <h3>Selesai</h3>
+                    <div class="stat-icon">✅</div>
+                </div>
+                <span class="value" id="selesaiOrder">0</span>
+            </div>
+        </section>
+
+        <section class="panel rn-panel" id="rnPanel">
+            <div class="panel-title">🔔 Permintaan Perpanjangan — <span id="rnDashLabel">BEM</span> <span class="badge-count rn-count" id="rnCount" style="display:none;">0</span> <span class="panel-hint">dari pelanggan, menunggu konfirmasi</span></div>
+            <div class="rn-gate" id="rnGate">
+                <span>🔒 Masukkan PIN admin untuk melihat permintaan perpanjangan</span>
+                <input type="password" id="rnPinInput" placeholder="PIN admin" autocomplete="off">
+                <button type="button" class="btn btn-primary" id="rnPinBtn">Buka</button>
+            </div>
+            <div id="rnBody" style="display:none;">
+                <div class="rn-filter" id="rnFilter">
+                    <button type="button" data-f="pending" class="on">⏳ Menunggu <i>0</i></button>
+                    <button type="button" data-f="approved">✅ Disetujui <i>0</i></button>
+                    <button type="button" data-f="rejected">✖ Ditolak <i>0</i></button>
+                </div>
+                <div id="rnList"></div>
+                <div class="rn-empty" id="rnEmpty" style="display:none;"></div>
+            </div>
+        </section>
+
+        <section class="st-grid dash-stats collapsible-group">
+            <div class="panel"><div class="panel-title">📅 Langganan Baru per Bulan — <span id="dsLabel">BEM</span> <span class="panel-hint">aktif + arsip</span></div><div class="chart-box xs"><canvas id="dsBulan"></canvas></div></div>
+            <div class="panel"><div class="panel-title">🍩 Status Langganan Aktif — <span id="dsLabel2">BEM</span></div><div class="chart-box xs"><canvas id="dsStatus"></canvas></div></div>
+        </section>
+
+        <section class="panel input-section collapsible start-collapsed" data-ckey="tambah">
+            <div class="panel-title">➕ Tambah Pesanan Baru</div>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="orderNumber">Nama Pemesan</label>
+                    <input type="text" id="orderNumber" placeholder="cth. Andi Saputra">
+                </div>
+                <div class="field">
+                    <label for="hashtag">Tagar / Kategori</label>
+                    <input type="text" id="hashtag" placeholder="cth. #lensbulanan">
+                </div>
+                <div class="field">
+                    <label for="whatsapp">Nomor WhatsApp</label>
+                    <input type="text" id="whatsapp" placeholder="+628xxxxxxxxxx">
+                </div>
+                <div class="field">
+                    <label for="packageTotal">Jumlah Paket (Limit)</label>
+                    <input type="number" id="packageTotal" placeholder="cth. 5" min="1">
+                </div>
+            </div>
+            <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+                <button class="btn btn-primary" id="addData">Tambah Pesanan</button>
+            </div>
+        </section>
+
+        <section class="panel table-section">
+            <div class="panel-title">📋 Daftar Langganan Aktif <span class="panel-hint">klik judul kolom untuk mengurutkan</span></div>
+
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Cari nama pemesan, tagar, atau nomor WA...">
+                </div>
+                <select id="statusFilterSelect" class="filter-select" title="Filter berdasarkan status">
+                    <option value="semua">Semua Status</option>
+                    <option value="proses">⏳ Proses</option>
+                    <option value="mendekati">⚠️ Mendekati Limit</option>
+                    <option value="selesai">✅ Limit Tercapai</option>
+                </select>
+                <span class="muted-note" id="filterInfo" style="margin:0;align-self:center;"></span>
+                <div class="toolbar-actions">
+                    <button type="button" class="btn btn-outline" id="pinAksiBtn" title="Kunci kolom Aksi di kanan, atau biarkan di ujung tabel">📌 Aksi: Disematkan</button>
+                    <button type="button" class="btn btn-outline" id="copyAllTagsBtn">📑 Salin Semua Tagar</button>
+                    <button type="button" class="btn btn-success" id="checkAllBtn">✅ Ceklis Semua</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table id="dashboardTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th class="sortable" data-sort="nama">Pemesan</th>
+                            <th class="sortable" data-sort="tagar">Tagar</th>
+                            <th class="sortable" data-sort="status">Status</th>
+                            <th class="sortable" data-sort="persen">Progress</th>
+                            <th class="sortable" data-sort="mulai">Tgl Mulai</th>
+                            <th class="sortable" data-sort="selesai">Est. Selesai</th>
+                            <th class="sortable" data-sort="sisa">Sisa Durasi</th>
+                            <th>Keterangan</th>
+                            <th class="col-aksi">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="state-block" id="tableLoadingState" style="display:none;">
+                <div class="spinner"></div>
+                <div class="state-title">Memuat data pesanan...</div>
+            </div>
+
+            <div class="state-block" id="tableEmptyState" style="display:none;">
+                <div class="state-icon">🗒️</div>
+                <div class="state-title">Belum ada pesanan aktif</div>
+                <div class="state-sub">Tambahkan pesanan baru lewat form di atas, atau ubah kata kunci pencarian Anda.</div>
+            </div>
+        </section>
+    </section>
+
+    <!-- ============ VIEW: STATISTIK ============ -->
+    <section class="view" id="view-statistik">
+        <section class="stats st-kpi">
+            <div class="stat-card total"><div class="stat-top"><h3>Total Langganan</h3><div class="stat-icon">📦</div></div><span class="value" id="stAll">0</span></div>
+            <div class="stat-card proses"><div class="stat-top"><h3>Total BEM</h3><div class="stat-icon">🅱️</div></div><span class="value" id="stBEM">0</span></div>
+            <div class="stat-card limit"><div class="stat-top"><h3>Total SEM</h3><div class="stat-icon">🅢</div></div><span class="value" id="stSEM">0</span></div>
+            <div class="stat-card selesai"><div class="stat-top"><h3>Total LEM</h3><div class="stat-icon">🅻</div></div><span class="value" id="stLEM">0</span></div>
+        </section>
+        <section class="panel">
+            <div class="panel-title">📅 Langganan Baru per Bulan <span class="panel-hint">aktif + arsip, 12 bulan terakhir</span></div>
+            <div class="chart-box"><canvas id="chartBulan"></canvas></div>
+        </section>
+        <section class="st-grid">
+            <div class="panel"><div class="panel-title">🍩 Komposisi BEM / SEM / LEM</div><div class="chart-box sm"><canvas id="chartKomposisi"></canvas></div></div>
+            <div class="panel"><div class="panel-title">📈 Tren Total Langganan</div><div class="chart-box sm"><canvas id="chartTren"></canvas></div></div>
+        </section>
+    </section>
+
+    <!-- ============ VIEW: DATA ARSIP ============ -->
+    <section class="view" id="view-arsip">
+
+        <section class="panel">
+            <div class="panel-title">🗂️ Data Arsip</div>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-top:-8px; margin-bottom:16px;">
+                Pesanan yang telah mencapai limit dan dipindahkan dari daftar aktif akan tersimpan di sini.
+            </p>
+
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="archiveSearchInput" placeholder="Cari di data arsip...">
+                </div>
+                <select class="filter-select" id="archiveFilterDashboard">
+                    <option value="ALL">Semua Dashboard</option>
+                    <option value="BEM">BEM</option>
+                    <option value="LEM">LEM</option>
+                    <option value="SEM">SEM</option>
+                </select>
+                <select class="filter-select" id="archiveSort">
+                    <option value="newest">Terbaru Diarsipkan</option>
+                    <option value="oldest">Terlama Diarsipkan</option>
+                    <option value="name">Nama A-Z</option>
+                </select>
+            </div>
+
+            <div class="archive-grid" id="archiveGrid"></div>
+
+            <div class="state-block" id="archiveEmptyState" style="display:none;">
+                <div class="state-icon">📭</div>
+                <div class="state-title">Belum ada data arsip</div>
+                <div class="state-sub">Pesanan yang sudah mencapai limit pengiriman bisa dipindahkan ke sini lewat tombol "Simpan ke Arsip".</div>
+            </div>
+        </section>
+    </section>
+
+    <!-- ============ VIEW: PRODUK ============ -->
+    <section class="view" id="view-produk">
+
+        <nav class="dashboard-tabs" id="produkCategoryTabs">
+            <button type="button" class="tab active" data-kategori="10BOX">📦 Akun 10 BOX</button>
+            <button type="button" class="tab" data-kategori="9BOX">📦 Akun 9 BOX</button>
+        </nav>
+
+        <nav class="dashboard-tabs" id="produkDashboardTabs" style="margin-top:10px;">
+            <button type="button" class="tab active" data-produk-dashboard="BEM">BEM</button>
+            <button type="button" class="tab" data-produk-dashboard="LEM">LEM</button>
+            <button type="button" class="tab" data-produk-dashboard="SEM">SEM</button>
+        </nav>
+
+        <section class="stats">
+            <div class="stat-card total">
+                <div class="stat-top">
+                    <h3>Total Produk</h3>
+                    <div class="stat-icon">📦</div>
+                </div>
+                <span class="value" id="produkTotal">0</span>
+            </div>
+
+            <div class="stat-card proses">
+                <div class="stat-top">
+                    <h3>Total Akun Terpakai</h3>
+                    <div class="stat-icon">🔢</div>
+                </div>
+                <span class="value" id="produkTerpakai">0</span>
+            </div>
+
+            <div class="stat-card limit">
+                <div class="stat-top">
+                    <h3>Menunggu Keputusan</h3>
+                    <div class="stat-icon">⚠️</div>
+                </div>
+                <span class="value" id="produkMenunggu">0</span>
+            </div>
+
+            <div class="stat-card selesai">
+                <div class="stat-top">
+                    <h3>Sudah Diputuskan</h3>
+                    <div class="stat-icon">✅</div>
+                </div>
+                <span class="value" id="produkSelesai">0</span>
+            </div>
+        </section>
+
+        <section class="panel input-section">
+            <div class="panel-title">➕ Tambah Produk Baru</div>
+            <div class="field-grid produk-field-grid">
+                <div class="field">
+                    <label for="produkNama">Nama Produk / Batch</label>
+                    <input type="text" id="produkNama" placeholder="cth. NEW BEM VOL 2">
+                </div>
+                <div class="field">
+                    <label for="produkJumlah">Jumlah Akun (Kapasitas)</label>
+                    <input type="number" id="produkJumlah" placeholder="cth. 100" min="1">
+                </div>
+            </div>
+            <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+                <button class="btn btn-primary" id="addProduk">Tambah Produk</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">🔍 Cari Posisi Tagar Akun</div>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-top:-8px; margin-bottom:14px;">
+                Lupa tagar tertentu ada di produk mana dan akun urutan ke berapa? Tempel atau ketik
+                tagarnya di sini — pencarian mencakup <b>semua produk</b>, semua kategori (10 BOX/9 BOX)
+                dan semua dashboard (BEM/LEM/SEM) sekaligus.
+            </p>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="cariTagarPosisiInput" placeholder="Ketik atau tempel tagar akun..." style="flex:1; padding:11px 13px; border-radius:10px; border:1.5px solid var(--border); font-size:14px; font-family:var(--font-body);">
+                <button type="button" class="btn btn-primary" id="cariTagarPosisiBtn">Cari</button>
+            </div>
+            <div id="cariTagarPosisiResult" style="margin-top:14px;"></div>
+        </section>
+
+        <section class="panel table-section">
+            <div class="panel-title">📋 Daftar Produk — <span id="produkPanelLabel">Akun 10 BOX &middot; BEM</span></div>
+
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="produkSearchInput" placeholder="Cari nama produk atau tagar error...">
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table id="produkTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Produk</th>
+                            <th>Kapasitas</th>
+                            <th>Tagar Error</th>
+                            <th>Keterangan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="produkTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="state-block" id="produkLoadingState" style="display:none;">
+                <div class="spinner"></div>
+                <div class="state-title">Memuat data produk...</div>
+            </div>
+
+            <div class="state-block" id="produkEmptyState" style="display:none;">
+                <div class="state-icon">📦</div>
+                <div class="state-title">Belum ada produk di kategori ini</div>
+                <div class="state-sub">Tambahkan produk baru lewat form di atas, misalnya "NEW BEM VOL 2" dengan kapasitas 100 akun.</div>
+            </div>
+        </section>
+    </section>
+
+    <!-- ============ VIEW: TAGAR ============ -->
+    <section class="view" id="view-tagar">
+
+        <section class="panel">
+            <div class="panel-title">🏷️ Input Massal Tagar</div>
+            <p class="tagar-input-hint">
+                Tempel atau ketik daftar tagar sebanyak apa pun (satu tagar per baris, atau dipisah koma).
+                Saat diproses, tagar otomatis dibagi jadi beberapa tabel — maksimal <b>200 tagar/tabel</b>,
+                dan diusahakan tidak ada tabel di bawah <b>100 tagar</b> (kecuali jumlah tagar Anda memang
+                kurang dari 100). Duplikat akan dideteksi otomatis dan tidak dihapus — hanya dilaporkan.
+            </p>
+
+            <div class="field" style="margin-bottom:12px;">
+                <label for="tagarBulkInput">Daftar Tagar</label>
+                <textarea id="tagarBulkInput" rows="10" placeholder="cth.&#10;#lensbulanan01&#10;#lensbulanan02&#10;#lensbulanan03&#10;...(tempel sebanyak apa pun)"></textarea>
+            </div>
+
+            <div class="tagar-stats-row" style="margin-bottom:16px;">
+                <span class="chip chip-info" id="tagarLiveTotal">Total: 0</span>
+                <span class="chip chip-info" id="tagarLiveUnique">Unik: 0</span>
+                <span class="chip chip-success" id="tagarLiveDup">Tidak Ada Duplikat</span>
+                <span class="chip chip-info" id="tagarLiveGroups">Perkiraan Tabel: 0</span>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="processTagarBtn">📥 Input &amp; Bagi Tagar</button>
+        </section>
+
+        <div id="tagarActiveResult"></div>
+
+        <section class="panel">
+            <div class="panel-title">🕘 Riwayat Batch Tagar</div>
+            <div id="tagarHistoryList"></div>
+            <div class="state-block" id="tagarHistoryEmpty" style="display:none;">
+                <div class="state-icon">🏷️</div>
+                <div class="state-title">Belum ada riwayat tagar</div>
+                <div class="state-sub">Proses daftar tagar pertama Anda lewat form di atas.</div>
+            </div>
+        </section>
+    </section>
+
+    <!-- ============ VIEW: AKUN PELANGGAN ============ -->
+    <section class="view" id="view-akun">
+
+        <!-- Gerbang PIN admin -->
+        <section class="panel" id="akunPinGate">
+            <div class="panel-title">🔒 Menu Akun Pelanggan</div>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-top:-8px; margin-bottom:16px;">
+                Menu ini khusus admin. Masukkan PIN admin untuk membuat akun login pelanggan
+                (portal terpisah di folder <code>/pelanggan</code>) yang terhubung ke data pesanan mereka.
+                PIN default pertama kali adalah <b>123456</b> — segera ganti setelah masuk.
+            </p>
+            <div class="field-grid" style="max-width:360px;">
+                <div class="field">
+                    <label for="akunPinInput">PIN Admin</label>
+                    <input type="password" id="akunPinInput" placeholder="Masukkan PIN admin" autocomplete="off">
+                </div>
+            </div>
+            <div style="margin-top:14px;">
+                <button class="btn btn-primary" id="akunPinSubmit">Masuk</button>
+            </div>
+        </section>
+
+        <!-- Konten setelah PIN benar -->
+        <div id="akunContent" style="display:none;">
+
+            <section class="panel input-section">
+                <div class="panel-title">➕ Buat Akun Pelanggan Baru</div>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:-8px; margin-bottom:16px;">
+                    Pilih nama pelanggan yang sudah ada di Dashboard Aktif (BEM/LEM/SEM). Nama seperti
+                    <b>"Pelanggan 88"</b> dan <b>"88"</b> otomatis dianggap sama saat login pelanggan nanti.
+                </p>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="akunPilihPelanggan">Pilih dari Pelanggan Aktif</label>
+                        <select id="akunPilihPelanggan">
+                            <option value="">— pilih pelanggan —</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="akunMatchSource">Nama / Kode Pelanggan (dipakai mencocokkan)</label>
+                        <input type="text" id="akunMatchSource" placeholder="cth. Pelanggan 88 atau 88">
+                    </div>
+                    <div class="field">
+                        <label for="akunUsername">Username Login</label>
+                        <input type="text" id="akunUsername" placeholder="cth. Pelanggan 88">
+                    </div>
+                    <div class="field">
+                        <label for="akunWhatsapp">Nomor WhatsApp (opsional, catatan admin)</label>
+                        <input type="text" id="akunWhatsapp" placeholder="+628xxxxxxxxxx">
+                    </div>
+                    <div class="field">
+                        <label for="akunPassword">Password Awal</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="akunPassword" placeholder="Minimal 6 karakter" style="flex:1;">
+                            <button type="button" class="btn btn-outline btn-icon" id="akunGeneratePw" title="Buat password acak">🎲</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:10px;">
+                    <button class="btn btn-primary" id="akunBuatBtn">Buat Akun</button>
+                </div>
+            </section>
+
+            <section class="panel table-section">
+                <div class="panel-title">📋 Daftar Akun Pelanggan</div>
+
+                <div class="toolbar">
+                    <div class="search-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="akunSearchInput" placeholder="Cari username atau nama pelanggan...">
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="akunTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Username</th>
+                                <th>Terhubung ke</th>
+                                <th>WhatsApp</th>
+                                <th>Pesanan Aktif</th>
+                                <th>Dibuat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="akunTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="state-block" id="akunLoadingState" style="display:none;">
+                    <div class="spinner"></div>
+                    <div class="state-title">Memuat akun pelanggan...</div>
+                </div>
+
+                <div class="state-block" id="akunEmptyState" style="display:none;">
+                    <div class="state-icon">👤</div>
+                    <div class="state-title">Belum ada akun pelanggan</div>
+                    <div class="state-sub">Buat akun pertama lewat form di atas.</div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title">🔑 Ganti PIN Admin</div>
+                <div class="field-grid" style="max-width:520px;">
+                    <div class="field">
+                        <label for="akunPinLama">PIN Lama</label>
+                        <input type="password" id="akunPinLama" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="akunPinBaru">PIN Baru</label>
+                        <input type="password" id="akunPinBaru" autocomplete="off">
+                    </div>
+                </div>
+                <div style="margin-top:14px;">
+                    <button class="btn btn-outline" id="akunGantiPinBtn">Simpan PIN Baru</button>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <!-- ============ VIEW: FARM SELL ============ -->
+    <section class="view" id="view-farmsell">
+        <section class="panel" id="fsPinGate">
+            <div class="panel-title">🔒 Farm Sell</div>
+            <p class="muted-note">Token farm bersifat rahasia. Masukkan PIN admin (sama dengan CashFlow / Akun Pelanggan).</p>
+            <div class="field-grid" style="max-width:360px;"><div class="field"><label for="fsPinInput">PIN Admin</label><input type="password" id="fsPinInput" placeholder="Masukkan PIN admin" autocomplete="off"></div></div>
+            <div style="margin-top:14px;"><button class="btn btn-primary" id="fsPinSubmit">Buka Farm Sell</button></div>
+        </section>
+
+        <div id="fsContent" style="display:none;">
+            <section class="stats st-kpi" style="grid-template-columns:repeat(3,1fr);">
+                <div class="stat-card total"><div class="stat-top"><h3>Token di Daftar</h3><div class="stat-icon">🌱</div></div><span class="value" id="fsSumAvail">0</span></div>
+                <div class="stat-card selesai"><div class="stat-top"><h3>Token di Arsip</h3><div class="stat-icon">🗂️</div></div><span class="value" id="fsSumTaken">0</span></div>
+                <div class="stat-card proses"><div class="stat-top"><h3>Jumlah Batch</h3><div class="stat-icon">🗃️</div></div><span class="value" id="fsSumBatch">0</span></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title">🗃️ Batch <button type="button" class="btn btn-primary cf-new-batch" id="fsNewBatchBtn">➕ Batch Baru</button></div>
+                <div class="cf-batch-list" id="fsBatchList"></div>
+                <div class="state-block" id="fsNoBatch" style="display:none;"><div class="state-icon">🗃️</div><div class="state-title">Belum ada batch</div><div class="state-sub">Klik "Batch Baru" untuk mulai menyimpan token.</div></div>
+            </section>
+
+            <div id="fsBatchPanel" style="display:none;">
+                <section class="panel">
+                    <div class="cf-batch-head">
+                        <div><h2 id="fsBatchTitle">Batch 1</h2><div class="cf-batch-meta"><span id="fsAvailInfo"></span></div></div>
+                        <div class="cf-batch-actions">
+                            <button type="button" class="btn btn-outline" id="fsRenameBtn">✏️ Ganti Nama</button>
+                            <button type="button" class="btn btn-danger btn-icon" id="fsDeleteBatchBtn" title="Hapus batch">🗑</button>
+                        </div>
+                    </div>
+                    <div class="st-grid">
+                        <div class="field"><label for="fsPaste">Tambah Token — paste banyak sekaligus</label>
+                            <textarea id="fsPaste" rows="5" placeholder="12-36358765,2mnchkrrg97yrzdh496zxb28xdrtdmt43y3gk9s3&#10;12-36358766,abc123...&#10;(satu baris = satu id,token)" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;"></textarea>
+                            <div class="muted-note" id="fsPreview" style="margin:8px 0 0;">Format per baris: <code>id,token</code> (boleh juga <code>nama,id,token</code>)</div>
+                            <div style="margin-top:10px;"><button class="btn btn-primary" id="fsAddBtn">➕ Tambahkan ke Daftar</button></div>
+                        </div>
+                        <div class="field"><label for="fsTakeN">Ambil Token</label>
+                            <input type="number" id="fsTakeN" min="1" placeholder="Jumlah, mis. 2">
+                            <div class="muted-note" style="margin:8px 0 0;">Token teratas diambil lalu otomatis dipindahkan ke Arsip Token.</div>
+                            <div style="margin-top:10px;"><button class="btn btn-success" id="fsTakeBtn">🌱 Ambil</button></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel table-section">
+                    <nav class="dashboard-tabs" id="fsTabs" style="margin-bottom:12px;">
+                        <button type="button" class="tab active" data-tab="available">Daftar Token</button>
+                        <button type="button" class="tab" data-tab="taken">Arsip Token</button>
+                    </nav>
+                    <div class="toolbar"><div class="toolbar-actions"><button type="button" class="btn btn-outline" id="fsCopyAllBtn">📋 Salin Semua (nama,id,token)</button></div></div>
+                    <div class="table-wrap aksi-pinned">
+                        <table id="fsTable" style="min-width:760px;">
+                            <thead><tr><th>No</th><th>Nama</th><th>ID</th><th>Token</th><th id="fsHeadExtra" style="display:none;">Diambil</th><th class="col-aksi">Aksi</th></tr></thead>
+                            <tbody id="fsBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="state-block" id="fsEmpty" style="display:none;"><div class="state-icon">🌱</div><div class="state-sub" id="fsEmptyText"></div></div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ VIEW: HAV SELL ============ -->
+    <section class="view" id="view-havsell">
+        <section class="panel" id="hvPinGate">
+            <div class="panel-title">🔒 HAV 🔑 SELL</div>
+            <p class="muted-note">Key bersifat rahasia. Masukkan PIN admin (sama dengan CashFlow / Farm Sell).</p>
+            <div class="field-grid" style="max-width:360px;"><div class="field"><label for="hvPinInput">PIN Admin</label><input type="password" id="hvPinInput" placeholder="Masukkan PIN admin" autocomplete="off"></div></div>
+            <div style="margin-top:14px;"><button class="btn btn-primary" id="hvPinSubmit">Buka HAV Sell</button></div>
+        </section>
+
+        <div id="hvContent" style="display:none;">
+            <section class="stats st-kpi" style="grid-template-columns:repeat(3,1fr);">
+                <div class="stat-card total"><div class="stat-top"><h3>Key di Daftar</h3><div class="stat-icon">🔑</div></div><span class="value" id="hvSumAvail">0</span></div>
+                <div class="stat-card selesai"><div class="stat-top"><h3>Key di Arsip</h3><div class="stat-icon">🗂️</div></div><span class="value" id="hvSumTaken">0</span></div>
+                <div class="stat-card proses"><div class="stat-top"><h3>Jumlah Batch</h3><div class="stat-icon">🗃️</div></div><span class="value" id="hvSumBatch">0</span></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title">🗃️ Batch <button type="button" class="btn btn-primary cf-new-batch" id="hvNewBatchBtn">➕ Batch Baru</button></div>
+                <div class="cf-batch-list" id="hvBatchList"></div>
+                <div class="state-block" id="hvNoBatch" style="display:none;"><div class="state-icon">🗃️</div><div class="state-title">Belum ada batch</div><div class="state-sub">Klik "Batch Baru" untuk mulai menyimpan key.</div></div>
+            </section>
+
+            <div id="hvBatchPanel" style="display:none;">
+                <section class="panel">
+                    <div class="cf-batch-head">
+                        <div><h2 id="hvBatchTitle">Batch 1</h2><div class="cf-batch-meta"><span id="hvAvailInfo"></span></div></div>
+                        <div class="cf-batch-actions">
+                            <button type="button" class="btn btn-outline" id="hvRenameBtn">✏️ Ganti Nama</button>
+                            <button type="button" class="btn btn-danger btn-icon" id="hvDeleteBatchBtn" title="Hapus batch">🗑</button>
+                        </div>
+                    </div>
+                    <div class="st-grid">
+                        <div class="field"><label for="hvPaste">Tambah Key — paste banyak sekaligus</label>
+                            <textarea id="hvPaste" rows="5" placeholder="HAV_SVip3MuP7M&#10;HAV_xxxxxxxxxx&#10;(satu baris = satu key)" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;"></textarea>
+                            <div class="muted-note" id="hvPreview" style="margin:8px 0 0;">Satu key per baris, contoh: <code>HAV_SVip3MuP7M</code></div>
+                            <div style="margin-top:10px;"><button class="btn btn-primary" id="hvAddBtn">➕ Tambahkan ke Daftar</button></div>
+                        </div>
+                        <div class="field"><label for="hvTakeN">Ambil Key</label>
+                            <input type="number" id="hvTakeN" min="1" placeholder="Jumlah, mis. 2">
+                            <div class="muted-note" style="margin:8px 0 0;">Yang muncul hanya key-nya, lalu otomatis pindah ke Arsip Key.</div>
+                            <div style="margin-top:10px;"><button class="btn btn-success" id="hvTakeBtn">🔑 Ambil</button></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel table-section">
+                    <nav class="dashboard-tabs" id="hvTabs" style="margin-bottom:12px;">
+                        <button type="button" class="tab active" data-tab="available">Daftar Key</button>
+                        <button type="button" class="tab" data-tab="taken">Arsip Key</button>
+                    </nav>
+                    <div class="toolbar"><div class="toolbar-actions"><button type="button" class="btn btn-outline" id="hvCopyAllBtn">📋 Salin Semua Key</button></div></div>
+                    <div class="table-wrap aksi-pinned">
+                        <table id="hvTable" style="min-width:480px;">
+                            <thead><tr><th>No</th><th>Key</th><th id="hvHeadExtra" style="display:none;">Diambil</th><th class="col-aksi">Aksi</th></tr></thead>
+                            <tbody id="hvBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="state-block" id="hvEmpty" style="display:none;"><div class="state-icon">🔑</div><div class="state-sub" id="hvEmptyText"></div></div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ VIEW: SUPPLY & STOCK ============ -->
+    <section class="view" id="view-supply">
+        <section class="panel" id="spPinGate">
+            <div class="panel-title">🔒 Supply & Stock</div>
+            <p class="muted-note">Masukkan PIN admin (sama dengan CashFlow / Farm Sell).</p>
+            <div class="field-grid" style="max-width:360px;"><div class="field"><label for="spPinInput">PIN Admin</label><input type="password" id="spPinInput" placeholder="Masukkan PIN admin" autocomplete="off"></div></div>
+            <div style="margin-top:14px;"><button class="btn btn-primary" id="spPinSubmit">Buka Supply & Stock</button></div>
+        </section>
+        <div id="spContent" style="display:none;">
+            <section class="stats st-kpi" style="grid-template-columns:repeat(3,1fr);">
+                <div class="stat-card total"><div class="stat-top"><h3>Batch Stok</h3><div class="stat-icon">📦</div></div><span class="value" id="spKpiBatch">0</span></div>
+                <div class="stat-card limit"><div class="stat-top"><h3>Order Menunggu</h3><div class="stat-icon">⏳</div></div><span class="value" id="spKpiPending">0</span></div>
+                <div class="stat-card selesai"><div class="stat-top"><h3>Order Terkirim</h3><div class="stat-icon">✅</div></div><span class="value" id="spKpiSent">0</span></div>
+            </section>
+            <nav class="dashboard-tabs" id="spTabs" style="margin-bottom:14px;">
+                <button type="button" class="tab active" data-tab="stok">📦 Stok</button>
+                <button type="button" class="tab" data-tab="order">🧾 Order</button>
+            </nav>
+            <div id="spStokWrap">
+                <div style="margin-bottom:14px;"><button class="btn btn-primary" id="spNewBatchBtn">➕ Batch Baru</button></div>
+                <div id="spBatches"></div>
+                <div class="state-block" id="spNoBatch" style="display:none;"><div class="state-icon">📦</div><div class="state-title">Belum ada batch stok</div><div class="state-sub">Klik "Batch Baru", mis. Batch 1 (jagung) dengan 4 akun.</div></div>
+            </div>
+            <div id="spOrderWrap" style="display:none;">
+                <section class="panel table-section">
+                    <div class="panel-title">🧾 Order dari Pelanggan</div>
+                    <nav class="dashboard-tabs" id="spOrderFilter" style="margin-bottom:12px;">
+                        <button type="button" class="tab active" data-f="pending">⏳ Menunggu</button>
+                        <button type="button" class="tab" data-f="sent">✅ Terkirim</button>
+                        <button type="button" class="tab" data-f="all">Semua</button>
+                    </nav>
+                    <div class="table-wrap aksi-pinned">
+                        <table style="min-width:640px;">
+                            <thead><tr><th>No</th><th>Waktu</th><th>Pelanggan</th><th>Barang</th><th class="num">Jumlah</th><th>Status</th><th class="col-aksi">Aksi</th></tr></thead>
+                            <tbody id="spOrderBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="state-block" id="spOrderEmpty" style="display:none;"><div class="state-icon">🧾</div><div class="state-sub">Belum ada order di kategori ini</div></div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ VIEW: PENGUMUMAN ============ -->
+    <section class="view" id="view-pengumuman">
+        <section class="panel" id="anPinGate">
+            <div class="panel-title">🔒 Pengumuman</div>
+            <p class="muted-note">Masukkan PIN admin.</p>
+            <div class="field-grid" style="max-width:360px;"><div class="field"><label for="anPinInput">PIN Admin</label><input type="password" id="anPinInput" placeholder="Masukkan PIN admin" autocomplete="off"></div></div>
+            <div style="margin-top:14px;"><button class="btn btn-primary" id="anPinSubmit">Buka Pengumuman</button></div>
+        </section>
+        <div id="anContent" style="display:none;">
+            <section class="panel">
+                <div class="panel-title" id="anFormTitle">➕ Buat Pengumuman</div>
+                <div class="field"><label for="anJudul">Judul</label><input type="text" id="anJudul" maxlength="120" placeholder="mis. Maintenance server malam ini"></div>
+                <div class="field"><label for="anIsi">Isi Pengumuman</label><textarea id="anIsi" rows="4" placeholder="Tulis pesan untuk pelanggan..."></textarea></div>
+                <div class="field-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+                    <div class="field"><label for="anTarget">Tampil untuk</label><select id="anTarget"><option value="semua">Semua pelanggan</option><option value="BEM">Pelanggan BEM</option><option value="SEM">Pelanggan SEM</option><option value="LEM">Pelanggan LEM</option></select></div>
+                    <div class="field"><label for="anEnds">Tayang sampai (opsional)</label><input type="date" id="anEnds"></div>
+                </div>
+                <div style="display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 14px;font-size:12.5px;">
+                    <label style="text-transform:none;letter-spacing:0;display:flex;gap:6px;align-items:center;"><input type="checkbox" id="anPinned"> 📌 Penting (disematkan di atas)</label>
+                    <label style="text-transform:none;letter-spacing:0;display:flex;gap:6px;align-items:center;"><input type="checkbox" id="anAktif" checked> Aktif</label>
+                </div>
+                <button class="btn btn-primary" id="anSaveBtn">📣 Terbitkan</button>
+                <button class="btn btn-ghost" id="anResetBtn" style="display:none;">Batal ubah</button>
+            </section>
+            <section class="panel table-section">
+                <div class="panel-title">📋 Daftar Pengumuman</div>
+                <div class="table-wrap aksi-pinned">
+                    <table style="min-width:640px;">
+                        <thead><tr><th>No</th><th>Pengumuman</th><th>Target</th><th>Tayang sampai</th><th>Status</th><th class="col-aksi">Aksi</th></tr></thead>
+                        <tbody id="anBody"></tbody>
+                    </table>
+                </div>
+                <div class="state-block" id="anEmpty" style="display:none;"><div class="state-icon">📣</div><div class="state-sub">Belum ada pengumuman</div></div>
+            </section>
+        </div>
+    </section>
+
+    <!-- ============ VIEW: CASHFLOW ============ -->
+    <section class="view" id="view-cashflow">
+
+        <section class="panel" id="cfPinGate">
+            <div class="panel-title">🔒 CashFlow</div>
+            <p class="muted-note">
+                Catatan pendapatan bersifat rahasia. Masukkan PIN admin untuk membuka
+                (PIN yang sama dengan menu Akun Pelanggan).
+            </p>
+            <div class="field-grid" style="max-width:360px;">
+                <div class="field">
+                    <label for="cfPinInput">PIN Admin</label>
+                    <input type="password" id="cfPinInput" placeholder="Masukkan PIN admin" autocomplete="off">
+                </div>
+            </div>
+            <div style="margin-top:14px;">
+                <button class="btn btn-primary" id="cfPinSubmit">Buka CashFlow</button>
+            </div>
+        </section>
+
+        <div id="cfContent" style="display:none;">
+
+            <section class="stats cf-summary">
+                <div class="stat-card total">
+                    <div class="stat-top"><h3>Pendapatan Batch Aktif</h3><div class="stat-icon">🟢</div></div>
+                    <span class="value" id="cfSumActive">Rp 0</span>
+                </div>
+                <div class="stat-card selesai">
+                    <div class="stat-top"><h3>Sudah Diambil (Withdraw)</h3><div class="stat-icon">🏦</div></div>
+                    <span class="value" id="cfSumWithdrawn">Rp 0</span>
+                </div>
+                <div class="stat-card proses">
+                    <div class="stat-top"><h3>Total Semua Batch</h3><div class="stat-icon">💰</div></div>
+                    <span class="value" id="cfSumAll">Rp 0</span>
+                </div>
+            </section>
+
+            <section class="panel collapsible" id="cfChartPanel">
+                <div class="panel-title">📊 Grafik & Riwayat Withdraw <span class="panel-hint">perbandingan antar batch</span></div>
+                <div class="st-grid">
+                    <div><div class="chart-sub">Pendapatan per Batch</div><div class="chart-box xs"><canvas id="cfChartBatch"></canvas></div></div>
+                    <div><div class="chart-sub">Perbandingan Withdraw (berdasarkan tanggal)</div><div class="chart-box xs"><canvas id="cfChartWd"></canvas></div></div>
+                </div>
+                <div class="table-wrap" style="margin-top:14px;">
+                    <table id="cfWdTable" style="min-width:560px;">
+                        <thead><tr><th>No</th><th>Batch</th><th>Tanggal Withdraw</th><th class="num">Total</th><th class="num">Selisih vs Sebelumnya</th></tr></thead>
+                        <tbody id="cfWdBody"></tbody>
+                    </table>
+                </div>
+                <div class="state-block" id="cfWdEmpty" style="display:none;"><div class="state-sub">Belum ada withdraw. Klik "Tandai Sudah Diambil" pada sebuah batch.</div></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title">
+                    🗃️ Batch
+                    <button type="button" class="btn btn-primary cf-new-batch" id="cfNewBatchBtn">➕ Batch Baru</button>
+                </div>
+                <div class="cf-batch-list" id="cfBatchList"></div>
+                <div class="state-block" id="cfNoBatchState" style="display:none;">
+                    <div class="state-icon">🗃️</div>
+                    <div class="state-title">Belum ada batch</div>
+                    <div class="state-sub">Klik "Batch Baru" untuk mulai mencatat pendapatan.</div>
+                </div>
+            </section>
+
+            <section class="panel" id="cfBatchPanel" style="display:none;">
+                <div class="cf-batch-head">
+                    <div>
+                        <h2 id="cfBatchTitle">Batch 1</h2>
+                        <div class="cf-batch-meta" id="cfBatchMeta"></div>
+                    </div>
+                    <div class="cf-batch-actions">
+                        <button type="button" class="btn btn-outline" id="cfRenameBtn">✏️ Ganti Nama</button>
+                        <button type="button" class="btn btn-success" id="cfWithdrawBtn">🏦 Tandai Sudah Diambil</button>
+                        <button type="button" class="btn btn-outline" id="cfReactivateBtn" style="display:none;">↩️ Aktifkan Kembali</button>
+                        <button type="button" class="btn btn-danger btn-icon" id="cfDeleteBatchBtn" title="Hapus batch">🗑</button>
+                    </div>
+                </div>
+
+                <div class="cf-form" id="cfForm">
+                    <div class="field">
+                        <label for="cfNama">Nama</label>
+                        <input type="text" id="cfNama" placeholder="Nama pembeli">
+                    </div>
+                    <div class="field">
+                        <label for="cfProduk">Produk</label>
+                        <input type="text" id="cfProduk" placeholder="Nama produk">
+                    </div>
+                    <div class="field">
+                        <label for="cfHarga">Harga (Rp)</label>
+                        <input type="number" id="cfHarga" placeholder="0" min="0">
+                    </div>
+                    <div class="field">
+                        <label for="cfJumlah">Jumlah</label>
+                        <input type="number" id="cfJumlah" placeholder="1" min="1" value="1">
+                    </div>
+                    <div class="field cf-form-total">
+                        <label>Total</label>
+                        <div class="cf-total-preview" id="cfTotalPreview">Rp 0</div>
+                    </div>
+                    <div class="field cf-form-btn">
+                        <button type="button" class="btn btn-primary" id="cfAddBtn">➕ Tambah</button>
+                    </div>
+                </div>
+
+                <div class="cf-locked-note" id="cfLockedNote" style="display:none;">
+                    🔒 Batch ini sudah ditandai <b>diambil (withdraw)</b> dan dikunci. Klik "Aktifkan Kembali" bila perlu mengubah data.
+                </div>
+
+                <div class="table-wrap">
+                    <table id="cfTable" class="cf-table">
+                        <thead>
+                            <tr>
+                                <th style="width:56px;">No</th>
+                                <th>Nama</th>
+                                <th>Produk</th>
+                                <th class="num">Harga</th>
+                                <th class="num">Jumlah</th>
+                                <th class="num">Total</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cfEntryBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="cf-foot-label">TOTAL KESELURUHAN</td>
+                                <td class="num" id="cfFootQty">0</td>
+                                <td class="num cf-foot-total" id="cfFootTotal">Rp 0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="state-block" id="cfEmptyState" style="display:none;">
+                    <div class="state-icon">🧾</div>
+                    <div class="state-title">Belum ada data di batch ini</div>
+                    <div class="state-sub">Isi nama, produk, harga, dan jumlah di atas, lalu klik Tambah.</div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalBox"></div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div id="toastStack"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/archive.js"></script>
+<script src="js/checklist.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/produk.js"></script>
+<script src="js/tagar.js"></script>
+<script src="js/akun-pelanggan.js"></script>
+<script src="js/perpanjang.js"></script>
+<script src="js/pro-ui.js"></script>
+<script src="js/cashflow.js"></script>
+<script src="js/farmsell.js"></script>
+<script src="js/havsell.js"></script>
+<script src="js/supply.js"></script>
+<script src="js/announce.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/app.js"></script>
+<script src="js/ui-extra.js"></script>
+<script src="js/init.js"></script>
+</body>
+</html>
